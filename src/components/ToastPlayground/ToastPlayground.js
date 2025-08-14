@@ -1,19 +1,20 @@
 import React from "react";
-
 import Button from "../Button";
-import Toast from "../Toast";
-
+import ToastShelf from "../ToastShelf/ToastShelf";
 import styles from "./ToastPlayground.module.css";
-
+import { ToastContext } from "../ToastProvider";
 const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
 
 function ToastPlayground() {
   const [message, setMessage] = React.useState("");
   const [variant, setVariant] = React.useState(VARIANT_OPTIONS[0]);
-  const [rendered, setRendered] = React.useState(false);
+  const { createToast } = React.useContext(ToastContext);
 
-  function dismissMessage() {
-    setRendered(false);
+  function handleCreateToast(e) {
+    e.preventDefault();
+    createToast(message, variant);
+    setMessage("");
+    setVariant(VARIANT_OPTIONS[0]);
   }
   return (
     <div className={styles.wrapper}>
@@ -21,15 +22,8 @@ function ToastPlayground() {
         <img alt="Cute toast mascot" src="/toast.png" />
         <h1>Toast Playground</h1>
       </header>
-      {rendered && (
-        <Toast
-          message={message}
-          variant={variant}
-          dismissMessage={dismissMessage}
-        />
-      )}
-
-      <div className={styles.controlsWrapper}>
+      <ToastShelf />
+      <form className={styles.controlsWrapper} onSubmit={handleCreateToast}>
         <div className={styles.row}>
           <label
             htmlFor="message"
@@ -55,7 +49,7 @@ function ToastPlayground() {
               <div className={`${styles.inputWrapper} ${styles.radioWrapper}`}>
                 <label htmlFor={`variant-${item}`}>
                   <input
-                    key={item}
+                    key={`variant-${item}`}
                     id={`variant-${item}`}
                     type="radio"
                     name="variant"
@@ -72,16 +66,10 @@ function ToastPlayground() {
         <div className={styles.row}>
           <div className={styles.label} />
           <div className={`${styles.inputWrapper} ${styles.radioWrapper}`}>
-            <Button
-              onClick={() => {
-                setRendered(true);
-              }}
-            >
-              Pop Toast!
-            </Button>
+            <Button>Pop Toast!</Button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
